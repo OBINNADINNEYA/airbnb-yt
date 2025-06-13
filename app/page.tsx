@@ -1,6 +1,7 @@
 import { db } from './lib/db';
 import SpaceCard from '@/app/components/SpaceCard';
 import { MapFilterItems } from '@/app/components/MapFilterItems';
+import Footer from '@/app/components/Footer';
 
 export default async function Home() {
   try {
@@ -13,7 +14,9 @@ export default async function Home() {
           {data.map((item) => (
             <SpaceCard key={item.id} space={item} />
           ))}
+          
         </div>
+        
       </main>
     );
   } catch (error) {

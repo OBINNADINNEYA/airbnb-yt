@@ -12,6 +12,11 @@ const nextConfig = {
         protocol: "https",
         port: "",
       },
+      {
+        hostname: "img.icons8.com",
+        protocol: "https",
+        port: "",
+      },
     ],
   },
 };
