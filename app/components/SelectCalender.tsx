@@ -8,9 +8,9 @@ import { useState } from "react";
 import { eachDayOfInterval } from "date-fns";
 
 export function SelectCalender({
-  reservation,
+  booking,
 }: {
-  reservation:
+  booking:
     | {
         startDate: Date;
         endDate: Date;
@@ -26,10 +26,10 @@ export function SelectCalender({
   ]);
 
   let disabledDates: Date[] = [];
-  reservation?.forEach((reservationItem) => {
+  booking?.forEach((bookingItem) => {
     const dateRange = eachDayOfInterval({
-      start: new Date(reservationItem.startDate),
-      end: new Date(reservationItem.endDate),
+      start: new Date(bookingItem.startDate),
+      end: new Date(bookingItem.endDate),
     });
 
     disabledDates = [...disabledDates, ...dateRange];

@@ -1,5 +1,6 @@
 import { db } from './lib/db';
-import HomeCard from '@/app/components/HomeCard';
+import SpaceCard from '@/app/components/SpaceCard';
+import { MapFilterItems } from '@/app/components/MapFilterItems';
 
 export default async function Home() {
   try {
@@ -7,9 +8,10 @@ export default async function Home() {
 
     return (
       <main className="container mx-auto px-5 lg:px-10">
+        <MapFilterItems />
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-8">
           {data.map((item) => (
-            <HomeCard key={item.id} space={item} />
+            <SpaceCard key={item.id} space={item} />
           ))}
         </div>
       </main>

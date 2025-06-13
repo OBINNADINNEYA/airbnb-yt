@@ -2,11 +2,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Space } from '../lib/db';
 
-interface HomeCardProps {
+interface SpaceCardProps {
   space: Space;
 }
 
-export default function HomeCard({ space }: HomeCardProps) {
+export default function SpaceCard({ space }: SpaceCardProps) {
   return (
     <Link href={`/space/${space.id}`}>
       <div className="flex flex-col w-full">

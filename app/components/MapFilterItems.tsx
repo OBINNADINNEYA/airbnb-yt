@@ -31,7 +31,7 @@ export function MapFilterItems() {
           href={pathname + "?" + createQueryString("filter", item.name)}
           className={cn(
             search === item.name
-              ? "border-b-2 border-black pb-2 flex-shrink-0"
+              ? "border-b-2 border-green-500 pb-2 flex-shrink-0"
               : "opacity-70 flex-shrink-0",
             "flex flex-col gap-y-3 items-center"
           )}
@@ -40,12 +40,12 @@ export function MapFilterItems() {
             <Image
               src={item.imageUrl}
               alt="Category image"
-              className="w-6 h-6"
+              className="w-6 h-6 filter invert sepia saturate-500 brightness-50"
               width={24}
               height={24}
             />
           </div>
-          <p className="text-xs font-medium">{item.title}</p>
+          <p className="text-xs font-medium text-green-500">{item.title}</p>
         </Link>
       ))}
     </div>

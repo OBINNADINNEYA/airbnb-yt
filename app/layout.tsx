@@ -18,8 +18,20 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Navbar />
-        {children}
+        <div className="relative min-h-screen overflow-hidden">
+          {/* Background image with dark overlay */}
+          <img
+            src="/logan-weaver-lgnwvr-ObzjIISsJjI-unsplash.jpg"
+            alt="stretch background"
+            className="absolute inset-0 w-full h-full object-cover object-center z-0"
+          />
+          <div className="absolute inset-0 bg-black/60 z-0" />
+          {/* All content above background */}
+          <div className="relative z-10">
+            <Navbar />
+            {children}
+          </div>
+        </div>
       </body>
     </html>
   );

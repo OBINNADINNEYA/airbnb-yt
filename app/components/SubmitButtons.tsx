@@ -76,7 +76,7 @@ export function DeleteFromFavoriteButton() {
   );
 }
 
-export function ReservationSubmitButton() {
+export function BookingSubmitButton() {
   const { pending } = useFormStatus();
 
   return (
@@ -87,7 +87,7 @@ export function ReservationSubmitButton() {
         </Button>
       ) : (
         <Button className="w-full" type="submit">
-          Make a Reservation!
+          Make a Booking!
         </Button>
       )}
     </>

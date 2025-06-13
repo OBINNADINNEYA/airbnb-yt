@@ -6,51 +6,39 @@ import { supabase } from "./lib/supabase";
 import { revalidatePath } from "next/cache";
 import path from "path";
 
-export async function createAirbnbHome({ userId }: { userId: string }) {
-  const data = await db.getHome(userId);
+export async function createSpaceWithUser({ userId }: { userId: string }) {
+  const data = await db.getSpace(userId);
 
   if (data === null) {
-    const data = await db.createHome({
-      userId: userId,
+    const data = await db.createSpace({
+      user_id: userId,
+      title: '',
+      price_per_hour: 0,
+      is_available: true,
     });
-
     return redirect(`/create/${data.id}/structure`);
-  } else if (
-    !data.addedCategory &&
-    !data.addedDescription &&
-    !data.addedLoaction
-  ) {
-    return redirect(`/create/${data.id}/structure`);
-  } else if (data.addedCategory && !data.addedDescription) {
-    return redirect(`/create/${data.id}/description`);
-  } else if (
-    data.addedCategory &&
-    data.addedDescription &&
-    !data.addedLoaction
-  ) {
-    return redirect(`/create/${data.id}/address`);
-  } else if (
-    data.addedCategory &&
-    data.addedDescription &&
-    data.addedLoaction
-  ) {
-    const data = await db.createHome({
-      userId: userId,
-    });
-
+  } else {
     return redirect(`/create/${data.id}/structure`);
   }
 }
 
 export async function createCategoryPage(formData: FormData) {
   const categoryName = formData.get("categoryName") as string;
-  const homeId = formData.get("homeId") as string;
-  const data = await db.updateHome(homeId, {
-    categoryName: categoryName,
-    addedCategory: true,
-  });
+  const spaceId = formData.get("spaceId") as string;
+  const theCategoryId = await supabase
+    .from('categories')
+    .select('id')
+    .eq('name', categoryName)
+    .single()
+    .then(res => res.data?.id);
 
-  return redirect(`/create/${homeId}/description`);
+  if (theCategoryId) {
+    await supabase
+      .from('space_categories')
+      .upsert({ space_id: spaceId, category_id: theCategoryId });
+  }
+
+  return redirect(`/create/${spaceId}/description`);
 }
 
 export async function CreateDescription(formData: FormData) {
@@ -58,11 +46,7 @@ export async function CreateDescription(formData: FormData) {
   const description = formData.get("description") as string;
   const price = formData.get("price");
   const imageFile = formData.get("image") as File;
-  const homeId = formData.get("homeId") as string;
-
-  const guestNumber = formData.get("guest") as string;
-  const roomNumber = formData.get("room") as string;
-  const bathroomsNumber = formData.get("bathroom") as string;
+  const spaceId = formData.get("spaceId") as string;
 
   const { data: imageData } = await supabase.storage
     .from("images")
@@ -71,39 +55,81 @@ export async function CreateDescription(formData: FormData) {
       contentType: "image/png",
     });
 
-  const data = await db.updateHome(homeId, {
+  const data = await db.updateSpace(spaceId, {
     title: title,
     description: description,
-    price: Number(price),
-    bedrooms: roomNumber,
-    bathrooms: bathroomsNumber,
-    guests: guestNumber,
-    photo: imageData?.path,
-    addedDescription: true,
+    price_per_hour: Number(price),
+    images: [imageData?.path ?? ''],
   });
 
-  return redirect(`/create/${homeId}/address`);
+  return redirect(`/create/${spaceId}/address`);
 }
 
 export async function createLocation(formData: FormData) {
-  const homeId = formData.get("homeId") as string;
-  const countryValue = formData.get("countryValue") as string;
-  const data = await db.updateHome(homeId, {
-    country: countryValue,
-    addedLoaction: true,
+  const spaceId = formData.get("spaceId") as string;
+  const locationValue = formData.get("locationValue") as string;
+  const data = await db.updateSpace(spaceId, {
+    location: locationValue,
   });
 
   return redirect("/");
 }
 
+export async function getSpaceById(id: string) {
+  try {
+    const data = await db.getSpace(id);
+    return data;
+  } catch (error) {
+    console.error('Error:', error);
+    return null;
+  }
+}
+
+export async function createSpace(formData: FormData) {
+  try {
+    const data = await db.createSpace({
+      title: formData.get('title') as string,
+      description: formData.get('description') as string,
+      price_per_hour: parseInt(formData.get('price_per_hour') as string),
+      location: formData.get('location') as string,
+      images: [],
+      is_available: true,
+      user_id: formData.get('user_id') as string,
+    });
+    return data;
+  } catch (error) {
+    console.error('Error:', error);
+    return null;
+  }
+}
+
+export async function createBooking(formData: FormData) {
+  try {
+    const spaceId = formData.get("spaceId") as string;
+    const userId = formData.get("userId") as string;
+    const startTime = formData.get("startTime") as string;
+    const endTime = formData.get("endTime") as string;
+    const data = await db.createBooking({
+      space_id: spaceId,
+      user_id: userId,
+      start_time: startTime,
+      end_time: endTime,
+    });
+    return data;
+  } catch (error) {
+    console.error('Error:', error);
+    return null;
+  }
+}
+
 export async function addToFavorite(formData: FormData) {
-  const homeId = formData.get("homeId") as string;
+  const spaceId = formData.get("spaceId") as string;
   const userId = formData.get("userId") as string;
   const pathName = formData.get("pathName") as string;
 
   const data = await db.createFavorite({
     userId,
-    homeId,
+    spaceId,
   });
 
   revalidatePath(pathName);
@@ -121,16 +147,16 @@ export async function DeleteFromFavorite(formData: FormData) {
 
 export async function createReservation(
   userId: string,
-  homeId: string,
+  spaceId: string,
   startDate: Date,
   endDate: Date
 ) {
   try {
-    const data = await db.createReservation({
-      userId,
-      homeId,
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
+    const data = await db.createBooking({
+      space_id: spaceId,
+      user_id: userId,
+      start_time: startDate.toISOString(),
+      end_time: endDate.toISOString(),
     });
     return data;
   } catch (error) {
@@ -141,31 +167,7 @@ export async function createReservation(
 
 export async function getHomeById(id: string) {
   try {
-    const data = await db.getHome(id);
-    return data;
-  } catch (error) {
-    console.error('Error:', error);
-    return null;
-  }
-}
-
-export async function createHome(formData: FormData) {
-  try {
-    const data = await db.createHome({
-      title: formData.get('title') as string,
-      description: formData.get('description') as string,
-      guests: formData.get('guests') as string,
-      bedrooms: formData.get('bedrooms') as string,
-      bathrooms: formData.get('bathrooms') as string,
-      country: formData.get('country') as string,
-      photo: formData.get('photo') as string,
-      price: parseInt(formData.get('price') as string),
-      categoryName: formData.get('categoryName') as string,
-      addedCategory: false,
-      addedDescription: false,
-      addedLoaction: false,
-      userId: formData.get('userId') as string,
-    });
+    const data = await db.getSpace(id);
     return data;
   } catch (error) {
     console.error('Error:', error);
@@ -175,9 +177,8 @@ export async function createHome(formData: FormData) {
 
 export async function updateHomeCategory(id: string, categoryName: string) {
   try {
-    const data = await db.updateHome(id, {
-      categoryName,
-      addedCategory: true,
+    const data = await db.updateSpace(id, {
+      space_type: categoryName,
     });
     return data;
   } catch (error) {
@@ -188,9 +189,8 @@ export async function updateHomeCategory(id: string, categoryName: string) {
 
 export async function updateHomeDescription(id: string, description: string) {
   try {
-    const data = await db.updateHome(id, {
+    const data = await db.updateSpace(id, {
       description,
-      addedDescription: true,
     });
     return data;
   } catch (error) {
@@ -201,9 +201,8 @@ export async function updateHomeDescription(id: string, description: string) {
 
 export async function updateHomeLocation(id: string, country: string) {
   try {
-    const data = await db.updateHome(id, {
-      country,
-      addedLoaction: true,
+    const data = await db.updateSpace(id, {
+      location: country,
     });
     return data;
   } catch (error) {
@@ -212,11 +211,11 @@ export async function updateHomeLocation(id: string, country: string) {
   }
 }
 
-export async function createFavorite(userId: string, homeId: string) {
+export async function createFavorite(userId: string, spaceId: string) {
   try {
     const data = await db.createFavorite({
       userId,
-      homeId,
+      spaceId,
     });
     return data;
   } catch (error) {

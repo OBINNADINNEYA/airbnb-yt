@@ -1,11 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 
-import { createReservation } from "@/app/actions";
+import { createBooking } from "@/app/actions";
 import { CaegoryShowcase } from "@/app/components/CategoryShowcase";
-import { HomeMap } from "@/app/components/HomeMap";
+import { SpaceMap } from "@/app/components/SpaceMap";
 import { SelectCalender } from "@/app/components/SelectCalender";
-import { ReservationSubmitButton } from "@/app/components/SubmitButtons";
-import prisma from "@/app/lib/db";
+import { BookingSubmitButton } from "@/app/components/SubmitButtons";
+import { db } from "@/app/lib/db";
 import { useCountries } from "@/app/lib/getCountries";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -15,48 +15,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { unstable_noStore as noStore } from "next/cache";
 
-async function getData(homeid: string) {
+async function getData(spaceId: string) {
   noStore();
-  const data = await prisma.home.findUnique({
-    where: {
-      id: homeid,
-    },
-    select: {
-      photo: true,
-      description: true,
-      guests: true,
-      bedrooms: true,
-      bathrooms: true,
-      title: true,
-      categoryName: true,
-      price: true,
-      country: true,
-      Reservation: {
-        where: {
-          homeId: homeid,
-        },
-      },
-
-      User: {
-        select: {
-          profileImage: true,
-          firstName: true,
-        },
-      },
-    },
-  });
-
+  const data = await db.getSpace(spaceId);
   return data;
 }
 
-export default async function HomeRoute({
+export default async function SpaceRoute({
   params,
 }: {
   params: { id: string };
 }) {
   const data = await getData(params.id);
   const { getCountryByValue } = useCountries();
-  const country = getCountryByValue(data?.country as string);
+  const country = getCountryByValue(data?.location as string);
   const { getUser } = getKindeServerSession();
   const user = await getUser();
   return (
@@ -64,8 +36,8 @@ export default async function HomeRoute({
       <h1 className="font-medium text-2xl mb-5">{data?.title}</h1>
       <div className="relative h-[550px]">
         <Image
-          alt="Image of Home"
-          src={`https://glvmmupiqwlmhicmggqp.supabase.co/storage/v1/object/public/images/${data?.photo}`}
+          alt="Image of Space"
+          src={data?.images?.[0] || "/placeholder.jpg"}
           fill
           className="rounded-lg h-full object-cover w-full"
         />
@@ -76,22 +48,18 @@ export default async function HomeRoute({
           <h3 className="text-xl font-medium">
             {country?.flag} {country?.label} / {country?.region}
           </h3>
-          <div className="flex gap-x-2 text-muted-foreground">
-            <p>{data?.guests} Guests</p> * <p>{data?.bedrooms} Bedrooms</p> *{" "}
-            {data?.bathrooms} Bathrooms
-          </div>
 
           <div className="flex items-center mt-6">
             <img
               src={
-                data?.User?.profileImage ??
+                data?.user?.profileImage ??
                 "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"
               }
               alt="User Profile"
               className="w-11 h-11 rounded-full"
             />
             <div className="flex flex-col ml-4">
-              <h3 className="font-medium">Hosted by {data?.User?.firstName}</h3>
+              <h3 className="font-medium">Hosted by {data?.user?.firstName}</h3>
               <p className="text-sm text-muted-foreground">Host since 2015</p>
             </div>
           </div>
@@ -106,20 +74,23 @@ export default async function HomeRoute({
 
           <Separator className="my-7" />
 
-          <HomeMap locationValue={country?.value as string} />
+          <SpaceMap locationValue={country?.value as string} />
         </div>
 
-        <form action={createReservation}>
-          <input type="hidden" name="homeId" value={params.id} />
+        <form action={createBooking}>
+          <input type="hidden" name="spaceId" value={params.id} />
           <input type="hidden" name="userId" value={user?.id} />
 
-          <SelectCalender reservation={data?.Reservation} />
+          <SelectCalender booking={data?.bookings?.map((b: any) => ({
+            startDate: new Date(b.start_time),
+            endDate: new Date(b.end_time)
+          }))} />
 
           {user?.id ? (
-            <ReservationSubmitButton />
+            <BookingSubmitButton />
           ) : (
             <Button className="w-full" asChild>
-              <Link href="/api/auth/login">Make a Reservation</Link>
+              <Link href="/api/auth/login">Book this Space</Link>
             </Button>
           )}
         </form>

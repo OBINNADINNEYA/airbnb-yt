@@ -18,6 +18,12 @@ export type Space = {
   is_available: boolean;
   user_id?: string;
   created_at: string;
+  space_type?: string;
+  room_type?: string;
+  linen_service?: boolean;
+  reception_area?: boolean;
+  user?: User;
+  bookings?: Booking[];
 };
 
 export type Favorite = {
@@ -37,6 +43,17 @@ export type Booking = {
   status: string;
   created_at: string;
 };
+
+type SpaceFilters = {
+  location?: string;
+  space_type?: string;
+  room_type?: string;
+  linen_service?: boolean;
+  reception_area?: boolean;
+  min_price?: number;
+  max_price?: number;
+};
+
 
 export const db = {
   // User operations
@@ -73,35 +90,82 @@ export const db = {
   },
 
   // Space operations
-  async getSpaces() {
-    try {
-      const { data, error } = await supabase
-        .from('spaces')
-        .select('*');
-      
-      if (error) throw error;
-      return data as Space[];
-    } catch (error) {
-      console.error('Error fetching spaces:', error);
-      throw error;
-    }
-  },
+ // Updated getSpaces function with filtering
 
-  async getSpace(id: string) {
-    try {
-      const { data, error } = await supabase
-        .from('spaces')
-        .select('*')
-        .eq('id', id)
-        .single();
-      
-      if (error) throw error;
-      return data as Space;
-    } catch (error) {
-      console.error('Error fetching space:', error);
-      throw error;
+ async getSpaces(filters: SpaceFilters = {}) {
+  try {
+    const query = supabase
+      .from("spaces")
+      .select("*, space_categories(categories(name))");
+
+    if (filters.location) {
+      query.ilike("location", `%${filters.location}%`);
     }
-  },
+
+    if (filters.space_type) {
+      query.eq("space_type", filters.space_type);
+    }
+
+    if (filters.room_type) {
+      query.eq("room_type", filters.room_type);
+    }
+
+    if (filters.linen_service !== undefined) {
+      query.eq("linen_service", filters.linen_service);
+    }
+
+    if (filters.reception_area !== undefined) {
+      query.eq("reception_area", filters.reception_area);
+    }
+
+    if (filters.min_price !== undefined) {
+      query.gte("price_per_hour", filters.min_price);
+    }
+
+    if (filters.max_price !== undefined) {
+      query.lte("price_per_hour", filters.max_price);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    const mappedSpaces = (data ?? []).map((space) => ({
+      ...space,
+      categoryNames:
+        space.space_categories?.map((sc: any) => sc.categories?.name) ?? [],
+    }));
+
+    return mappedSpaces as (Space & { categoryNames?: string[] })[];
+  } catch (error) {
+    console.error("Error fetching spaces:", error);
+    throw error;
+  }
+},
+
+
+async getSpace(id: string) {
+  try {
+    const { data, error } = await supabase
+      .from('spaces')
+      .select('*, user:users(*), bookings(*), space_categories:space_categories!inner(category:categories(name, icon))')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+
+    // Extract category name(s)
+    const categoryNames = data?.space_categories?.map((sc: any) => sc.category?.name) ?? [];
+
+    return {
+      ...data,
+      categoryNames, // or categoryName: categoryNames[0] if you only want one
+    };
+  } catch (error) {
+    console.error('Error fetching space:', error);
+    throw error;
+  }
+},
 
   async createSpace(space: Omit<Space, 'id' | 'created_at'>) {
     try {
