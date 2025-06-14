@@ -3,9 +3,9 @@ import { FaXTwitter } from "react-icons/fa6";
 
 export default function Footer() {
   return (
-    <footer className="w-full py-4 px-8 flex items-between justify-between bg-transparent text-green-500 text-sm">
+    <footer className="w-full py-4 px-8 flex items-between justify-between bg-transparent text-green-500 text-xs font-medium">
       <div className="flex items-center gap-2">
-        <span>© 2025 PhysioSpace, Inc.</span>
+        <span>© 2025 PhysioVerse, Inc.</span>
         <span className="mx-2">·</span>
         <a href="#" className="hover:underline">Privacy</a>
         <span className="mx-2">·</span>

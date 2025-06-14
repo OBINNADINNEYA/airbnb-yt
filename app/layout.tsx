@@ -5,8 +5,8 @@ import { Navbar } from "./components/Navbar";
 import Footer from "./components/Footer";
 
 export const metadata: Metadata = {
-  title: "PhysioSpace",
-  description: "PhysioSpace app",
+  title: "PhysioVerse",
+  description: "PhysioVerse app",
 };
 
 const inter = Inter({ subsets: ["latin"] });

@@ -1,15 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
-import DesktopLogo from "../../public/airbnb-desktop.png";
-import DesktopLogophysio from "../../public/PhysioSpace_Logo_2560x800.png";
-import MobileLogo from "../../public/airbnb-mobile.webp";
+import DesktopLogophysio from "../../public/physioVerseicon2560x800.png";
 import { UserNav } from "./UserNav";
 import { SearchModalComponent } from "./SearchComponent";
 
 export function Navbar() {
   return (
     <nav className="w-full bg-transparent">
-      <div className="flex items-center justify-between container mx-auto px-5 lg:px-10 py-3">
+      <div className="flex items-center justify-between container mb-x px-5 lg:px-10 py-3">
         <Link href="/">
           <Image
             src={DesktopLogophysio}
@@ -18,9 +16,9 @@ export function Navbar() {
           />
 
           <Image
-            src={MobileLogo}
+            src={DesktopLogophysio}
             alt="Mobile Logo"
-            className="block lg:hidden w-12"
+            className="block lg:hidden w-64"
           />
         </Link>
 

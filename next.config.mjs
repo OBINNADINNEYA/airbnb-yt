@@ -17,6 +17,18 @@ const nextConfig = {
         protocol: "https",
         port: "",
       },
+      {
+        hostname: "images.unsplash.com",
+        protocol: "https",
+        port: "",
+      },
+
+      {
+        hostname: "display.blogto.com",
+        protocol: "https",
+        port: "",
+      },
+      
     ],
   },
 };

@@ -1,7 +1,6 @@
 import { db } from './lib/db';
 import SpaceCard from '@/app/components/SpaceCard';
 import { MapFilterItems } from '@/app/components/MapFilterItems';
-import Footer from '@/app/components/Footer';
 
 export default async function Home() {
   try {
