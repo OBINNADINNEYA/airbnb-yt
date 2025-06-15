@@ -51,7 +51,7 @@ export async function UserNav() {
               </form>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Link href="/my-homes" className="w-full">
+              <Link href="/my-spaces" className="w-full">
                 My Listings
               </Link>
             </DropdownMenuItem>
@@ -61,7 +61,7 @@ export async function UserNav() {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Link href="/reservations" className="w-full">
+              <Link href="/bookings" className="w-full">
                 My Bookings
               </Link>
             </DropdownMenuItem>

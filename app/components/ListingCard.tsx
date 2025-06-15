@@ -12,7 +12,7 @@ interface iAppProps {
   userId: string | undefined;
   isInFavoriteList: boolean;
   favoriteId: string;
-  homeId: string;
+  spaceId: string;
   pathName: string;
 }
 
@@ -23,7 +23,7 @@ export function ListingCard({
   price,
   userId,
   favoriteId,
-  homeId,
+  spaceId,
   isInFavoriteList,
   pathName,
 }: iAppProps) {
@@ -51,7 +51,7 @@ export function ListingCard({
               </form>
             ) : (
               <form action={addToFavorite}>
-                <input type="hidden" name="homeId" value={homeId} />
+                <input type="hidden" name="spaceId" value={spaceId} />
                 <input type="hidden" name="userId" value={userId} />
                 <input type="hidden" name="pathName" value={pathName} />
                 <AddToFavoriteButton />
@@ -61,7 +61,7 @@ export function ListingCard({
         )}
       </div>
 
-      <Link href={`/home/${homeId}`} className="mt-2">
+      <Link href={`/space/${spaceId}`} className="mt-2">
         <h3 className="font-medium text-base">
           {country?.flag} {country?.label} / {country?.region}
         </h3>
