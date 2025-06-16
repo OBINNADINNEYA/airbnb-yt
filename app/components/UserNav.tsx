@@ -1,3 +1,4 @@
+
 /* eslint-disable @next/next/no-img-element */
 import {
   DropdownMenu,
@@ -7,22 +8,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MenuIcon } from "lucide-react";
-import {
-  RegisterLink,
-  LoginLink,
-  LogoutLink,
-} from "@kinde-oss/kinde-auth-nextjs/components";
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import Link from "next/link";
-import { createSpaceWithUser } from "../actions";
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import {User} from '@supabase/supabase-js';
+import { useEffect, useState } from 'react';
 
-export async function UserNav() {
-  const { getUser } = getKindeServerSession();
-  const user = await getUser();
+export function UserNav() {
+  const [user, setUser] = useState<User | null>(null);
+  const supabase = createClientComponentClient();
 
-  const createHomewithId = createSpaceWithUser.bind(null, {
-    userId: user?.id as string,
-  });
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user);
+    });
+    // eslint-disable-next-line
+  }, []);
 
   return (
     <DropdownMenu>
@@ -32,7 +32,8 @@ export async function UserNav() {
 
           <img
             src={
-              user?.picture ??
+              user?.user_metadata?.avatar_url ||
+              user?.user_metadata?.picture ||
               "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"
             }
             alt="Image of the user"
@@ -44,11 +45,9 @@ export async function UserNav() {
         {user ? (
           <>
             <DropdownMenuItem>
-              <form action={createHomewithId} className="w-full">
-                <button type="submit" className="w-full text-start">
-                  Airbnb your Space
-                </button>
-              </form>
+              <Link href="/create-space" className="w-full">
+                List your Space
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <Link href="/my-spaces" className="w-full">
@@ -67,16 +66,28 @@ export async function UserNav() {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <LogoutLink className="w-full">Logout</LogoutLink>
+              <button
+                className="w-full text-start"
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  window.location.reload();
+                }}
+              >
+                Logout
+              </button>
             </DropdownMenuItem>
           </>
         ) : (
           <>
             <DropdownMenuItem>
-              <RegisterLink className="w-full">Register</RegisterLink>
+              <Link href="/auth" className="w-full">
+                Register
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <LoginLink className="w-full">Login</LoginLink>
+              <Link href="/auth" className="w-full">
+                Login
+              </Link>
             </DropdownMenuItem>
           </>
         )}

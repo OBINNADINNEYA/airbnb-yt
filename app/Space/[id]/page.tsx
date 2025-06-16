@@ -9,7 +9,8 @@ import { db } from "@/app/lib/db";
 import { useCountries } from "@/app/lib/getCountries";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useEffect, useState } from 'react';
 
 import Image from "next/image";
 import Link from "next/link";
@@ -21,16 +22,30 @@ async function getData(spaceId: string) {
   return data;
 }
 
-export default async function SpaceRoute({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const data = await getData(params.id);
+export default function SpaceRoute({ params }: { params: { id: string } }) {
+  const [user, setUser] = useState<any>(null);
+  const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user);
+    });
+    // eslint-disable-next-line
+  }, []);
+
+  const [data, setData] = useState<any>(null);
+  useEffect(() => {
+    async function fetchData() {
+      const d = await getData(params.id);
+      setData(d);
+    }
+    fetchData();
+    // eslint-disable-next-line
+  }, [params.id]);
+
   const { getCountryByValue } = useCountries();
   const country = getCountryByValue(data?.location as string);
-  const { getUser } = getKindeServerSession();
-  const user = await getUser();
+
   return (
     <div className="w-[75%] mx-auto mt-10 mb-12">
       <h1 className="font-medium text-2xl mb-5">{data?.title}</h1>
@@ -90,7 +105,7 @@ export default async function SpaceRoute({
             <BookingSubmitButton />
           ) : (
             <Button className="w-full" asChild>
-              <Link href="/api/auth/login">Book this Space</Link>
+              <Link href="/auth">Book this Space</Link>
             </Button>
           )}
         </form>
