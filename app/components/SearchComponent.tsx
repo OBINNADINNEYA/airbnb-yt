@@ -22,7 +22,7 @@ import {
 
 import { Search } from "lucide-react";
 import { useState } from "react";
-import { useCountries } from "../lib/getCountries";
+import { useCanadianCities } from "../lib/getCanadianCities";
 import { SpaceMap } from "./SpaceMap";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
@@ -33,7 +33,7 @@ export function SearchModalComponent() {
   const [step, setStep] = useState(1);
   const [locationValue, setLocationValue] = useState("");
   const [spaceType, setSpaceType] = useState("");
-  const { getAllCountries } = useCountries();
+  const { getAllCities } = useCanadianCities();
 
   const SubmitButtonLocal = () =>
     step === 1 ? (
@@ -58,15 +58,15 @@ export function SearchModalComponent() {
 
       <DialogContent className="sm:max-w-[425px]">
         <form className="gap-4 flex flex-col">
-          <input type="hidden" name="country" value={locationValue} />
+          <input type="hidden" name="city" value={locationValue} />
           <input type="hidden" name="type" value={spaceType} />
 
           {step === 1 ? (
             <>
               <DialogHeader>
-                <DialogTitle>Select a Location</DialogTitle>
+                <DialogTitle>Select a City</DialogTitle>
                 <DialogDescription>
-                  Pick a country or region to start your search.
+                  Pick a city in Canada to start your search.
                 </DialogDescription>
               </DialogHeader>
 
@@ -76,14 +76,14 @@ export function SearchModalComponent() {
                 value={locationValue}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a Country" />
+                  <SelectValue placeholder="Select a City" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectLabel>Countries</SelectLabel>
-                    {getAllCountries().map((item) => (
+                    <SelectLabel>Cities</SelectLabel>
+                    {getAllCities().map((item) => (
                       <SelectItem key={item.value} value={item.value}>
-                        {item.flag} {item.label} / {item.region}
+                        {item.label}
                       </SelectItem>
                     ))}
                   </SelectGroup>

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { useCountries } from "../lib/getCountries";
+import { useCanadianCities } from "../lib/getCanadianCities";
 import { AddToFavoriteButton, DeleteFromFavoriteButton } from "./SubmitButtons";
 import { DeleteFromFavorite, addToFavorite } from "../actions";
 
@@ -27,8 +27,8 @@ export function ListingCard({
   isInFavoriteList,
   pathName,
 }: iAppProps) {
-  const { getCountryByValue } = useCountries();
-  const country = getCountryByValue(location);
+  const { getCityByValue } = useCanadianCities();
+  const city = getCityByValue(location);
 
   return (
     <div className="flex flex-col">
@@ -63,7 +63,7 @@ export function ListingCard({
 
       <Link href={`/space/${spaceId}`} className="mt-2">
         <h3 className="font-medium text-base">
-          {country?.flag} {country?.label} / {country?.region}
+          {city?.label}
         </h3>
         <p className="text-muted-foreground text-sm line-clamp-2">
           {description}

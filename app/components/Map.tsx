@@ -1,32 +1,52 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import { useCountries } from "../lib/getCountries";
-import { icon } from "leaflet";
+import { useEffect, useRef } from 'react';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import { useCanadianCities } from "../lib/getCanadianCities";
 
-const ICON = icon({
-  iconUrl:
-    "https://images.vexels.com/media/users/3/131261/isolated/preview/b2e48580147ca0ed3f970f30bf8bb009-karten-standortmarkierung.png",
-  iconSize: [50, 50],
-});
+// Initialize Mapbox with your token
+mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
 
 export default function Map({ locationValue }: { locationValue: string }) {
-  const { getCountryByValue } = useCountries();
-  const latLang = getCountryByValue(locationValue)?.latLang;
-  return (
-    <MapContainer
-      scrollWheelZoom={false}
-      className="h-[50vh] rounded-lg relative z-0"
-      center={latLang ?? [52.505, -0.09]}
-      zoom={8}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<mapboxgl.Map | null>(null);
+  const { getCityByValue } = useCanadianCities();
+  const latLang = getCityByValue(locationValue)?.latLang;
+  // Swap to [lng, lat] for Mapbox
+  const mapboxCoords: [number, number] = latLang && latLang.length === 2
+    ? [latLang[1], latLang[0]]
+    : [-0.09, 52.505];
 
-      <Marker position={latLang ?? [52.505, -0.09]} icon={ICON} />
-    </MapContainer>
+  useEffect(() => {
+    if (!mapContainer.current) return;
+
+    // Initialize map
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: 'mapbox://styles/mapbox/dark-v11',
+      center: mapboxCoords,
+      zoom: 8
+    });
+
+    // Add navigation controls
+    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+    // Add marker
+    new mapboxgl.Marker()
+      .setLngLat(mapboxCoords)
+      .addTo(map.current);
+
+    // Cleanup
+    return () => {
+      map.current?.remove();
+    };
+  }, [mapboxCoords]);
+
+  return (
+    <div 
+      ref={mapContainer} 
+      className="h-[50vh] rounded-lg relative z-0"
+    />
   );
 }

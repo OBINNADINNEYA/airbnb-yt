@@ -2,7 +2,7 @@ import { db } from './lib/db';
 import SpaceCard from '@/app/components/SpaceCard';
 import { MapFilterItems } from '@/app/components/MapFilterItems';
 
-export default async function Home() {
+export default async function Space() {
   try {
     const data = await db.getSpaces();
 
