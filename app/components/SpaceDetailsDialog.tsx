@@ -30,21 +30,33 @@ export default function SpaceDetailsDialog({ space, open, onOpenChange }: SpaceD
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
+      console.log('Fetched user:', data.user);
       setUser(data.user);
+    }).catch((err) => {
+      console.error('Error fetching user:', err);
     });
   }, [supabase.auth]);
 
   useEffect(() => {
+    console.log('Dialog open:', open, 'space.id:', space.id);
     if (open && space.id) {
       setLoading(true);
-      db.getSpace(space.id).then((data) => {
-        setSpaceDetails(data);
-        setLoading(false);
-      });
+      db.getSpace(space.id)
+        .then((data) => {
+          console.log('Fetched space details:', data);
+          setSpaceDetails(data);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error('Error fetching space details:', err);
+          setLoading(false);
+        });
     }
   }, [open, space.id]);
 
-  const country = getCountryByValue(spaceDetails?.location as string);
+  // Use spaceDetails if available, otherwise fallback to the original space prop
+  const details = spaceDetails || space;
+  const country = getCountryByValue(details?.location as string);
 
   if (loading) {
     return (
@@ -62,7 +74,7 @@ export default function SpaceDetailsDialog({ space, open, onOpenChange }: SpaceD
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-medium">{spaceDetails?.title}</DialogTitle>
+          <DialogTitle className="text-2xl font-medium">{details?.title}</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-6">
@@ -70,9 +82,16 @@ export default function SpaceDetailsDialog({ space, open, onOpenChange }: SpaceD
           <div className="relative h-[400px] w-full">
             <Image
               alt="Image of Space"
-              src={spaceDetails?.images?.[0] || "/placeholder.jpg"}
+              src={
+                details?.images?.[0] && details.images[0] !== ''
+                  ? details.images[0]
+                  : "/placeholder.jpg"
+              }
               fill
               className="rounded-lg object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = "/placeholder.jpg";
+              }}
             />
           </div>
 
@@ -84,40 +103,45 @@ export default function SpaceDetailsDialog({ space, open, onOpenChange }: SpaceD
                   {country?.flag} {country?.label} / {country?.region}
                 </h3>
                 <p className="text-lg font-semibold text-green-500 mt-2">
-                  ${spaceDetails?.price_per_hour}/hour
+                  {typeof details?.price_per_hour === 'number' && !isNaN(details.price_per_hour)
+                    ? `$${details.price_per_hour}/hour`
+                    : 'N/A'}
                 </p>
-                <p className={spaceDetails?.is_available ? "text-green-500" : "text-red-500"}>
-                  {spaceDetails?.is_available ? 'Available' : 'Not Available'}
+                <p className={details?.is_available ? "text-green-500" : "text-red-500"}>
+                  {details?.is_available ? 'Available' : 'Not Available'}
                 </p>
               </div>
 
-              {/* Host Info */}
-              <div className="flex items-center">
+              {/* Host Info Placeholder */}
+              <div className="flex items-center opacity-50 pointer-events-none select-none">
                 <img
-                  src={
-                    spaceDetails?.user?.profileImage ??
-                    "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"
-                  }
-                  alt="User Profile"
+                  src="https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"
+                  alt="User Profile Placeholder"
                   className="w-11 h-11 rounded-full"
                 />
                 <div className="flex flex-col ml-4">
-                  <h3 className="font-medium">Hosted by {spaceDetails?.user?.firstName}</h3>
-                  <p className="text-sm text-muted-foreground">Host since 2015</p>
+                  <h3 className="font-medium">Hosted by <span className="italic text-gray-400">(coming soon)</span></h3>
+                  <p className="text-sm text-muted-foreground">Host info will be available in the future</p>
                 </div>
               </div>
 
               <Separator />
 
               {/* Category */}
-              <CaegoryShowcase categoryName={spaceDetails?.categoryName as string} />
+              {details?.categoryName ? (
+                <CaegoryShowcase categoryName={details.categoryName as string} />
+              ) : (
+                <div className="text-gray-400 italic">No category info</div>
+              )}
 
               <Separator />
 
               {/* Description */}
               <div>
                 <h4 className="font-medium mb-2">Description</h4>
-                <p className="text-muted-foreground">{spaceDetails?.description}</p>
+                <p className="text-muted-foreground">
+                  {details?.description ? details.description : <span className="italic text-gray-400">No description provided.</span>}
+                </p>
               </div>
 
               <Separator />
@@ -134,16 +158,19 @@ export default function SpaceDetailsDialog({ space, open, onOpenChange }: SpaceD
               <div className="border rounded-lg p-6 sticky top-0">
                 <h4 className="font-medium mb-4">Book this space</h4>
                 
-                <form action={createBooking}>
+                <form action={async (formData) => { await createBooking(formData); }}>
                   <input type="hidden" name="spaceId" value={space.id} />
                   <input type="hidden" name="userId" value={user?.id} />
 
-                  <SelectCalender 
-                    booking={spaceDetails?.bookings?.map((b: any) => ({
-                      startDate: new Date(b.start_time),
-                      endDate: new Date(b.end_time)
-                    }))} 
-                  />
+                  {/* Calendar with constrained width */}
+                  <div className="max-w-full w-full overflow-x-auto">
+                    <SelectCalender 
+                      booking={details?.bookings?.map((b: any) => ({
+                        startDate: new Date(b.start_time),
+                        endDate: new Date(b.end_time)
+                      }))} 
+                    />
+                  </div>
 
                   {user?.id ? (
                     <BookingSubmitButton />
