@@ -1,15 +1,23 @@
+"use client";
+
 import Image from 'next/image';
-import Link from 'next/link';
+import { useState } from 'react';
 import { Space } from '../lib/db';
+import SpaceDetailsDialog from './SpaceDetailsDialog';
 
 interface SpaceCardProps {
   space: Space;
 }
 
 export default function SpaceCard({ space }: SpaceCardProps) {
+  const [dialogOpen, setDialogOpen] = useState(false);
+
   return (
-    <Link href={`/space/${space.id}`}>
-      <div className="flex flex-col w-full">
+    <>
+      <div 
+        className="flex flex-col w-full cursor-pointer"
+        onClick={() => setDialogOpen(true)}
+      >
         <div className="relative w-full h-72">
           <Image
             src={space.images?.[0] || '/placeholder.jpg'}
@@ -29,6 +37,12 @@ export default function SpaceCard({ space }: SpaceCardProps) {
           </p>
         </div>
       </div>
-    </Link>
+      
+      <SpaceDetailsDialog 
+        space={space} 
+        open={dialogOpen} 
+        onOpenChange={setDialogOpen} 
+      />
+    </>
   );
 } 

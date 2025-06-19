@@ -28,12 +28,39 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import { CreationSubmit } from "./SubmitButtons";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export function SearchModalComponent() {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [locationValue, setLocationValue] = useState("");
   const [spaceType, setSpaceType] = useState("");
+  const [equipment, setEquipment] = useState<string[]>([]);
+  const [roomType, setRoomType] = useState("");
+  const [receptionArea, setReceptionArea] = useState("");
+  const [linenService, setLinenService] = useState("");
   const { getAllCities } = useCanadianCities();
+
+  function handleEquipmentChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const value = e.target.value;
+    setEquipment((prev) =>
+      e.target.checked ? [...prev, value] : prev.filter((v) => v !== value)
+    );
+  }
+
+  function handleShowResults(e: React.FormEvent) {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (locationValue) params.set("city", locationValue);
+    if (spaceType) params.set("space_type", spaceType);
+    if (equipment.length === 1) params.set("category", equipment[0]);
+    if (roomType) params.set("room_type", roomType);
+    if (receptionArea) params.set("reception_area", receptionArea);
+    if (linenService) params.set("linen_service", linenService);
+    router.push("/?" + params.toString());
+    setOpen(false);
+  }
 
   const SubmitButtonLocal = () =>
     step === 1 ? (
@@ -41,13 +68,16 @@ export function SearchModalComponent() {
         Next
       </Button>
     ) : (
-      <CreationSubmit />
+      <Button type="submit">Show Results</Button>
     );
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <div className="rounded-full py-2 px-5 border flex items-center cursor-pointer">
+        <div
+          className="rounded-full py-2 px-5 border flex items-center cursor-pointer"
+          onClick={() => setOpen(true)}
+        >
           <div className="flex h-full divide-x font-medium">
             <p className="px-4 text-green-500">{locationValue || "Anywhere"}</p>
             <p className="px-4 text-green-500">{spaceType || "Any Treatment"}</p>
@@ -57,7 +87,7 @@ export function SearchModalComponent() {
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[425px]">
-        <form className="gap-4 flex flex-col">
+        <form className="gap-4 flex flex-col" onSubmit={handleShowResults}>
           <input type="hidden" name="city" value={locationValue} />
           <input type="hidden" name="type" value={spaceType} />
 
@@ -106,7 +136,7 @@ export function SearchModalComponent() {
                   {/* 1. Treatment Type */}
                   <div className="flex flex-col gap-y-2">
                     <h3 className="font-medium underline">Type of Treatment</h3>
-                    <Select value={spaceType} onValueChange={(val) => setSpaceType(val)}>
+                    <Select value={spaceType} onValueChange={setSpaceType}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select treatment type" />
                       </SelectTrigger>
@@ -141,6 +171,8 @@ export function SearchModalComponent() {
                             name="equipment"
                             value={item.name}
                             className="accent-primary"
+                            checked={equipment.includes(item.name)}
+                            onChange={handleEquipmentChange}
                           />
                           {item.label}
                         </label>
@@ -151,7 +183,7 @@ export function SearchModalComponent() {
                   {/* 3. Room Type */}
                   <div className="flex flex-col gap-y-2">
                     <h3 className="font-medium underline">Room Preference</h3>
-                    <Select name="room_type">
+                    <Select value={roomType} onValueChange={setRoomType}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select room type" />
                       </SelectTrigger>
@@ -166,7 +198,7 @@ export function SearchModalComponent() {
                   {/* 4. Reception Area */}
                   <div className="flex flex-col gap-y-2">
                     <h3 className="font-medium underline">Reception Area</h3>
-                    <Select name="reception_area">
+                    <Select value={receptionArea} onValueChange={setReceptionArea}>
                       <SelectTrigger>
                         <SelectValue placeholder="Need a waiting area?" />
                       </SelectTrigger>
@@ -180,7 +212,7 @@ export function SearchModalComponent() {
                   {/* 5. Linen Service */}
                   <div className="flex flex-col gap-y-2">
                     <h3 className="font-medium underline">Linen Service</h3>
-                    <Select name="linen_service">
+                    <Select value={linenService} onValueChange={setLinenService}>
                       <SelectTrigger>
                         <SelectValue placeholder="Need linen or towels?" />
                       </SelectTrigger>

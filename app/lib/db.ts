@@ -1,4 +1,6 @@
 import { supabase } from './supabase';
+import { useState } from 'react';
+import { useRouter } from 'next/router';
 
 export type User = {
   id: string;
@@ -52,6 +54,7 @@ type SpaceFilters = {
   reception_area?: boolean;
   min_price?: number;
   max_price?: number;
+  category?: string;
 };
 
 
@@ -94,12 +97,15 @@ export const db = {
 
  async getSpaces(filters: SpaceFilters = {}) {
   try {
-    const query = supabase
+    let query = supabase
       .from("spaces")
-      .select("*, space_categories(categories(name))");
+      .select("*, space_categories!inner(categories!inner(name))");
 
+    if (filters.category) {
+      query = query.eq("space_categories.categories.name", filters.category);
+    }
     if (filters.location) {
-      query.ilike("location", `%${filters.location}%`);
+      query = query.ilike("location", `%${filters.location}%`);
     }
 
     if (filters.space_type) {

@@ -16,7 +16,12 @@ export function MapFilterItems() {
     (name: string, value: string) => {
       const params = new URLSearchParams(searchParams.toString());
 
-      params.set(name, value);
+      // If clicking the same category, remove the filter
+      if (params.get(name) === value) {
+        params.delete(name);
+      } else {
+        params.set(name, value);
+      }
 
       return params.toString();
     },

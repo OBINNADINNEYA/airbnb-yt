@@ -2,9 +2,19 @@ import { db } from './lib/db';
 import SpaceCard from '@/app/components/SpaceCard';
 import { MapFilterItems } from '@/app/components/MapFilterItems';
 
-export default async function Space() {
+export default async function Space({ searchParams }: { searchParams: Record<string, string> }) {
   try {
-    const data = await db.getSpaces();
+    // Build filters from searchParams
+    const filters: any = {};
+    if (searchParams.city) filters.location = searchParams.city;
+    if (searchParams.space_type) filters.space_type = searchParams.space_type;
+    if (searchParams.room_type && searchParams.room_type !== 'either') filters.room_type = searchParams.room_type;
+    if (searchParams.reception_area) filters.reception_area = searchParams.reception_area === 'yes';
+    if (searchParams.linen_service) filters.linen_service = searchParams.linen_service === 'yes';
+    if (searchParams.category) filters.category = searchParams.category;
+    // Add more filters as needed (e.g., equipment, min_price, max_price)
+
+    const data = await db.getSpaces(filters);
 
     return (
       <main className="container mx-auto px-5 lg:px-10">
@@ -13,9 +23,7 @@ export default async function Space() {
           {data.map((item) => (
             <SpaceCard key={item.id} space={item} />
           ))}
-          
         </div>
-        
       </main>
     );
   } catch (error) {
