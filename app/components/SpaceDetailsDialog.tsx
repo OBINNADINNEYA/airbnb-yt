@@ -149,12 +149,12 @@ export default function SpaceDetailsDialog({ space, open, onOpenChange }: SpaceD
               {/* Map */}
               <div>
                 <h4 className="font-medium mb-2">Location</h4>
-                <SpaceMap locationValue={country?.value as string} />
+                <SpaceMap locationValue={details?.location as string} />
               </div>
             </div>
 
             {/* Right Column - Booking Form */}
-            <div className="w-80">
+            <div className="w-100">
               <div className="border rounded-lg p-6 sticky top-0">
                 <h4 className="font-medium mb-4">Book this space</h4>
                 
@@ -168,7 +168,7 @@ export default function SpaceDetailsDialog({ space, open, onOpenChange }: SpaceD
                       booking={details?.bookings?.map((b: any) => ({
                         startDate: new Date(b.start_time),
                         endDate: new Date(b.end_time)
-                      }))} 
+                      }))}
                     />
                   </div>
 
