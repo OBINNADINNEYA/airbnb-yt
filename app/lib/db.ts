@@ -154,7 +154,7 @@ async getSpace(id: string) {
   try {
     const { data, error } = await supabase
       .from('spaces')
-      .select('*, user:users(*), bookings(*), space_categories:space_categories!inner(category:categories(name, icon))')
+      .select('*, description, user:users(*), bookings(*), space_categories:space_categories!inner(category:categories(name, icon))')
       .eq('id', id)
       .single();
 

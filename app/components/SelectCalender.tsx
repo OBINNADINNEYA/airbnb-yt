@@ -49,7 +49,7 @@ export function SelectCalender({
       <DateRange
         date={new Date()}
         showDateDisplay={false}
-        rangeColors={["#FF5A5F"]}
+        rangeColors={["#16a34a"]}
         ranges={state}
         onChange={(item) => setState([item.selection] as any)}
         minDate={new Date()}

@@ -58,12 +58,76 @@
   }
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
-.no-scrollbar {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+/* Dark theme for react-date-range calendar */
+.rdrCalendarWrapper {
+  background-color: #0f172a !important; /* slate-900 */
+  color: #e2e8f0 !important; /* slate-200 */
+  border-radius: 0.5rem !important; /* rounded-lg */
+  overflow: hidden;
+}
+
+.rdrMonthAndYearWrapper {
+  background-color: transparent;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.rdrMonthAndYearPickers select {
+  background-color: #1e293b; /* slate-800 */
+  color: white;
+  border-radius: 4px;
+}
+
+.rdrNextPrevButton {
+  background-color: #1e293b; /* slate-800 */
+}
+
+.rdrNextPrevButton:hover {
+  background-color: #334155; /* slate-700 */
+}
+
+.rdrWeekDay {
+  color: white;
+}
+
+.rdrDay {
+  color: white;
+}
+
+.rdrDay:not(.rdrDayPassive) .rdrInRange ~ .rdrDayNumber span, .rdrDay:not(.rdrDayPassive) .rdrStartEdge ~ .rdrDayNumber span, .rdrDay:not(.rdrDayPassive) .rdrEndEdge ~ .rdrDayNumber span, .rdrDay:not(.rdrDayPassive) .rdrSelected ~ .rdrDayNumber span {
+  color: white;
+}
+
+.rdrDayPassive .rdrDayNumber span {
+  color: #475569; /* slate-600 */
+}
+
+.rdrDayHovered, .rdrDayInPreview {
+  background-color: #334155; /* slate-700 */
+  border-color: #475569;
+}
+
+.rdrDayDisabled {
+  background-color: #1e293b !important;
+  color: #475569 !important;
+}
+
+.rdrDayDisabled .rdrDayNumber span {
+    color: #475569 !important;
+}
+
+.rdrMonth {
+  background-color: transparent !important;
+}
+
+.rdrInRange, .rdrStartEdge, .rdrEndEdge {
+  background-color: #16a34a; /* green-600 */
+  color: white;
 }
 

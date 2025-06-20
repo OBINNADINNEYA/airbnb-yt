@@ -56,7 +56,7 @@ export default function SpaceDetailsDialog({ space, open, onOpenChange }: SpaceD
 
   // Use spaceDetails if available, otherwise fallback to the original space prop
   const details = spaceDetails || space;
-  const country = getCountryByValue(details?.location as string);
+  const locationDetails = getCountryByValue(details?.location as string);
 
   if (loading) {
     return (
@@ -100,7 +100,9 @@ export default function SpaceDetailsDialog({ space, open, onOpenChange }: SpaceD
             <div className="flex-1 space-y-6">
               <div>
                 <h3 className="text-xl font-medium">
-                  {country?.flag} {country?.label} / {country?.region}
+                  {locationDetails
+                    ? `${locationDetails.flag} ${locationDetails.label} / ${locationDetails.region}`
+                    : details?.location || 'Unknown Location'}
                 </h3>
                 <p className="text-lg font-semibold text-green-500 mt-2">
                   {typeof details?.price_per_hour === 'number' && !isNaN(details.price_per_hour)
@@ -128,8 +130,18 @@ export default function SpaceDetailsDialog({ space, open, onOpenChange }: SpaceD
               <Separator />
 
               {/* Category */}
-              {details?.categoryName ? (
-                <CaegoryShowcase categoryName={details.categoryName as string} />
+              {details?.space_categories?.length > 0 ? (
+                <div className="flex flex-wrap gap-4">
+                  {details.space_categories.map((sc: any) =>
+                    sc.category ? (
+                      <CaegoryShowcase
+                        key={sc.category.name}
+                        categoryName={sc.category.name}
+                        iconUrl={sc.category.icon}
+                      />
+                    ) : null
+                  )}
+                </div>
               ) : (
                 <div className="text-gray-400 italic">No category info</div>
               )}
