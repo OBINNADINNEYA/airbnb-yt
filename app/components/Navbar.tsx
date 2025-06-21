@@ -6,27 +6,26 @@ import { SearchModalComponent } from "./SearchComponent";
 
 export function Navbar() {
   return (
-    <nav className="w-full bg-transparent">
-      <div className="flex items-center justify-between container mb-x px-5 lg:px-10 py-3">
+    <nav className="w-full">
+      <div className="grid items-center grid-cols-3 w-full px-5 lg:px-10 py-5">
         <Link href="/">
           <Image
             src={DesktopLogophysio}
             alt="Desktop Logo"
-            className="w-64 hidden lg:block"
+            className="w-48 hidden lg:block"
           />
-
           <Image
             src={DesktopLogophysio}
             alt="Mobile Logo"
-            className="block lg:hidden w-64"
+            className="block lg:hidden w-32"
           />
         </Link>
-
-        <div className="justify-self-center">
+        <div className="flex justify-center">
           <SearchModalComponent />
         </div>
-
-        <UserNav />
+        <div className="flex justify-end">
+          <UserNav />
+        </div>
       </div>
     </nav>
   );
