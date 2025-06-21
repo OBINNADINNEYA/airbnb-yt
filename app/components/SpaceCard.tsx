@@ -18,7 +18,7 @@ export default function SpaceCard({ space }: SpaceCardProps) {
         className="flex flex-col w-full cursor-pointer"
         onClick={() => setDialogOpen(true)}
       >
-        <div className="relative w-full h-72">
+        <div className="relative w-full h-48">
           <Image
             src={space.images?.[0] || '/placeholder.jpg'}
             alt={space.title}

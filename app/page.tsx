@@ -17,7 +17,7 @@ export default async function Space({ searchParams }: { searchParams: Record<str
     const data = await db.getSpaces(filters);
 
     return (
-      <main className="px-5 lg:px-10">
+      <main className="px-5 lg:px-40 " >
         <MapFilterItems />
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mt-8">
           {data.map((item) => (
