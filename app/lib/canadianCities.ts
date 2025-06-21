@@ -11,4 +11,17 @@ export const canadianCities = [
   { value: "Kitchener", label: "Kitchener", latLang: [43.451639, -80.492533] },
   { value: "Halifax", label: "Halifax", latLang: [44.648764, -63.575239] },
   { value: "Victoria", label: "Victoria", latLang: [48.428421, -123.365644] },
-]; 
+  { value: "London", label: "London", latLang: [42.984923, -81.245277] },
+  { value: "Windsor", label: "Windsor", latLang: [42.314937, -83.036363] },
+  { value: "St. John's", label: "St. John's", latLang: [47.561509, -52.712576] },
+  { value: "Saskatoon", label: "Saskatoon", latLang: [52.133214, -106.670046] },
+  { value: "Regina", label: "Regina", latLang: [50.445211, -104.618894] },
+  { value: "Sherbrooke", label: "Sherbrooke", latLang: [45.400992, -71.882427] },
+  { value: "Barrie", label: "Barrie", latLang: [44.389356, -79.690331] },
+  { value: "Kelowna", label: "Kelowna", latLang: [49.888041, -119.496010] },
+  { value: "Guelph", label: "Guelph", latLang: [43.544804, -80.248167] },
+  { value: "Saguenay", label: "Saguenay", latLang: [48.416644, -71.065491] },
+  { value: "Trois-Rivières", label: "Trois-Rivières", latLang: [46.34296, -72.54775] },
+  { value: "Brantford", label: "Brantford", latLang: [43.139386, -80.264425] },
+  { value: "Thunder Bay", label: "Thunder Bay", latLang: [48.380895, -89.247682] }
+];
