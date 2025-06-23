@@ -99,7 +99,7 @@ export const db = {
   try {
     let query = supabase
       .from("spaces")
-      .select("*, space_categories!inner(categories!inner(name))");
+      .select("*, space_categories(categories(name))");
 
     if (filters.category) {
       query = query.eq("space_categories.categories.name", filters.category);
@@ -154,7 +154,7 @@ async getSpace(id: string) {
   try {
     const { data, error } = await supabase
       .from('spaces')
-      .select('*, description, user:users(*), bookings(*), space_categories:space_categories!inner(category:categories(name, icon))')
+      .select('*, description, user:users(*), bookings(*), space_categories(category:categories(name, icon))')
       .eq('id', id)
       .single();
 
@@ -165,7 +165,7 @@ async getSpace(id: string) {
 
     return {
       ...data,
-      categoryNames, // or categoryName: categoryNames[0] if you only want one
+      categoryNames,
     };
   } catch (error) {
     console.error('Error fetching space:', error);

@@ -16,6 +16,8 @@ export default async function Space({ searchParams }: { searchParams: Record<str
 
     const data = await db.getSpaces(filters);
 
+    console.log("Spaces data:", data);
+
     return (
       <main className="px-5 lg:px-40 " >
         <MapFilterItems />
@@ -26,13 +28,14 @@ export default async function Space({ searchParams }: { searchParams: Record<str
         </div>
       </main>
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error loading spaces:', error);
     return (
       <main className="px-5 lg:px-10">
         <div className="text-center mt-8">
           <h2 className="text-2xl font-semibold">Something went wrong</h2>
           <p className="text-gray-500">Please try again later</p>
+          <p>{error instanceof Error ? error.message : String(error)}</p>
         </div>
       </main>
     );
