@@ -97,39 +97,40 @@ export const db = {
 
  async getSpaces(filters: SpaceFilters = {}) {
   try {
-    let query = supabase
-      .from("spaces")
-      .select("*, space_categories(categories(name))");
-
+    let query;
     if (filters.category) {
-      query = query.eq("space_categories.categories.name", filters.category);
+      // Use inner join for category filtering
+      query = supabase
+        .from("spaces")
+        .select("*, space_categories!inner(category:categories!inner(name))")
+        .eq("space_categories.category.name", filters.category);
+    } else {
+      // Use left join to show all spaces
+      query = supabase
+        .from("spaces")
+        .select("*, space_categories(category:categories(name))");
     }
+
     if (filters.location) {
       query = query.ilike("location", `%${filters.location}%`);
     }
-
     if (filters.space_type) {
-      query.eq("space_type", filters.space_type);
+      query = query.eq("space_type", filters.space_type);
     }
-
     if (filters.room_type) {
-      query.eq("room_type", filters.room_type);
+      query = query.eq("room_type", filters.room_type);
     }
-
     if (filters.linen_service !== undefined) {
-      query.eq("linen_service", filters.linen_service);
+      query = query.eq("linen_service", filters.linen_service);
     }
-
     if (filters.reception_area !== undefined) {
-      query.eq("reception_area", filters.reception_area);
+      query = query.eq("reception_area", filters.reception_area);
     }
-
     if (filters.min_price !== undefined) {
-      query.gte("price_per_hour", filters.min_price);
+      query = query.gte("price_per_hour", filters.min_price);
     }
-
     if (filters.max_price !== undefined) {
-      query.lte("price_per_hour", filters.max_price);
+      query = query.lte("price_per_hour", filters.max_price);
     }
 
     const { data, error } = await query;
@@ -139,7 +140,7 @@ export const db = {
     const mappedSpaces = (data ?? []).map((space) => ({
       ...space,
       categoryNames:
-        space.space_categories?.map((sc: any) => sc.categories?.name) ?? [],
+        space.space_categories?.map((sc: any) => sc.category?.name || sc.categories?.name) ?? [],
     }));
 
     return mappedSpaces as (Space & { categoryNames?: string[] })[];

@@ -83,13 +83,58 @@ PhysioVerse is a platform for booking physiotherapy and gym spaces. Users can se
 
 ---
 
-## 6. Out of Scope
+## 6. System Architecture & UML Overview
+
+The PhysioVerse application is structured as a modular, component-based Next.js app with a clear separation between UI, business logic, and data access. The system leverages Supabase as its backend for authentication and database services.
+
+**Key Actors:**
+- User (Guest): Can browse spaces, search/filter, and view details.
+- User (Authenticated): (Planned) Can list spaces, book, favorite, and manage listings.
+
+**Main Components:**
+- Navbar: Top-level navigation, includes UserNav, MapFilterItems, and SearchModalComponent.
+- UserNav: Shows "Sign In" and "Register" for guests; will show user menu for authenticated users.
+- SearchModalComponent: Modal for city/treatment search and filter refinement.
+- MapFilterItems: Category filter bar.
+- SpaceCard & ListingCard: Display individual space listings.
+- SpaceDetailsDialog: Shows detailed info for a selected space.
+
+**Data Access Layer:**
+- db: Centralized module for all database operations (fetching spaces, users, bookings, etc.), using the Supabase client.
+
+**Database Entities:**
+- Space: Represents a rentable space.
+- User: Represents a user (host or guest).
+- Booking: Represents a reservation for a space.
+- Favorite: Represents a user's favorite space.
+- Category: Represents a space category (e.g., Gym, Rehab).
+- SpaceCategory: Join table for many-to-many relationship between spaces and categories.
+
+**External Service:**
+- Supabase: Provides authentication and database (Postgres) as a service.
+
+**UML Diagram:**
+
+The following UML diagram visualizes the relationships between the main components, actors, and database entities:
+
+[Insert your generated UML diagram here]
+
+**Diagram Key Points:**
+- Users interact with the Navbar, which routes to search, filters, and user actions.
+- All data operations are funneled through the `db` module, which communicates with Supabase.
+- Spaces, Users, Bookings, Favorites, and Categories are the core data entities.
+- UI components are decoupled and reusable, supporting a scalable and maintainable architecture.
+- User-specific menu options are hidden until authentication is implemented.
+
+---
+
+## 7. Out of Scope
 - Payment processing (for now)
 - International cities (Canada only for MVP)
 
 ---
 
-## 7. Open Questions
+## 8. Open Questions
 - Should users be able to save favorite searches?
 - Should hosts be able to set custom cancellation policies?
 

@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 export function MapFilterItems() {
   const searchParams = useSearchParams();
-  const search = searchParams.get("filter");
+  const search = searchParams.get("category");
   const pathname = usePathname();
 
   const createQueryString = useCallback(
@@ -29,11 +29,11 @@ export function MapFilterItems() {
   );
 
   return (
-    <div className="flex gap-x-7 mt-5 w-full overflow-x-scroll no-scrollbar">
+    <div className="flex gap-x-16 mt-4 w-full overflow-x-scroll no-scrollbar">
       {categoryItems.map((item) => (
         <Link
           key={item.id}
-          href={pathname + "?" + createQueryString("filter", item.name)}
+          href={pathname + "?" + createQueryString("category", item.name)}
           className={cn(
             search === item.name
               ? "border-b-2 border-green-500 pb-2 flex-shrink-0"
