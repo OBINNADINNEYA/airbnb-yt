@@ -26,11 +26,12 @@ export default function SpaceCard({ space }: SpaceCardProps) {
             className="object-cover rounded-xl"
           />
         </div>
-        <div className="mt-3 text-sm">
+        <div className="mt-3 text-xs">
           <div className="flex justify-between items-center">
-            <h2 className="font-medium text-sm text-green-500">{space.title}</h2>
-            <p className="font-medium text-sm text-white">${space.price_per_hour}/hour</p>
+            <h2 className="font-light text-xs text-green-500">{space.title}</h2>
+            
           </div>
+          <p className="font-light text-xs text-white">${space.price_per_hour}/hour</p>
           <p className="text-white">{space.location}</p>
           <p className={space.is_available ? "text-green-500" : "text-red-500"}>
             {space.is_available ? 'Available' : 'Not Available'}

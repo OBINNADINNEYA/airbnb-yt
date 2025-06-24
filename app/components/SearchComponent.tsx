@@ -79,8 +79,8 @@ export function SearchModalComponent() {
           onClick={() => setOpen(true)}
         >
           <div className="flex h-full divide-x font-medium">
-            <p className="px-4 text-green-500">{locationValue || "Anywhere"}</p>
-            <p className="px-4 text-green-500">{spaceType || "Any Treatment"}</p>
+            <p className="px-4 py-2 text-green-500">{locationValue || "Anywhere"}</p>
+            <p className="px-4 py-2 text-green-500">{spaceType || "Any Treatment"}</p>
           </div>
           <Search className="bg-primary text-white p-1 h-8 w-8 rounded-full" />
         </div>
@@ -105,7 +105,7 @@ export function SearchModalComponent() {
                 onValueChange={(value) => setLocationValue(value)}
                 value={locationValue}
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full text-black">
                   <SelectValue placeholder="Select a City" />
                 </SelectTrigger>
                 <SelectContent>
